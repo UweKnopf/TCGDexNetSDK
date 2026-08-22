@@ -109,9 +109,10 @@ public class TCGDex: IDisposable
         }
         
         RestRequest req = new RestRequest(fetchParam);
-        
-        var response = await _client.GetAsync<List<T>>(req);
-        foreach (var card in response!)
+        try
+        {
+            var response = await _client.GetAsync<List<T>>(req);
+            foreach (var card in response!)
         {
             card.TCGDex = this;
         }
@@ -123,6 +124,14 @@ public class TCGDex: IDisposable
         };
 
         return response;
+
+        }
+        catch (Exception)
+        {
+            Console.WriteLine($"Error fetching list of {typeof(T).Name} from {fetchParam}");
+            return null;
+        }
+        
     }
 
     private async Task<List<T>> FetchList<T>(string fetchParam, Query query) where T : Model
